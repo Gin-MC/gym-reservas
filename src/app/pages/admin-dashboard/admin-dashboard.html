@@ -1,1 +1,434 @@
-<p>admin-dashboard works!</p>
+<div class="admin-container">
+  <div class="container">
+    <!-- Header -->
+    <div class="page-header">
+      <div>
+        <h1>Panel de Administración</h1>
+        <p class="subtitle">Gestión completa del gimnasio</p>
+      </div>
+      <button mat-raised-button color="primary" class="create-button">
+        <mat-icon>add</mat-icon>
+        Nueva Clase
+      </button>
+    </div>
+
+    <!-- Loading -->
+    @if (loading) {
+      <div class="loading-container">
+        <mat-spinner></mat-spinner>
+        <p>Cargando datos del sistema...</p>
+      </div>
+    }
+
+    @if (!loading) {
+      <!-- Stats Cards -->
+      <div class="stats-grid">
+        <mat-card class="stat-card">
+          <mat-icon class="stat-icon primary">event</mat-icon>
+          <div class="stat-content">
+            <div class="stat-number">{{ stats.totalClasses }}</div>
+            <div class="stat-label">Total de Clases</div>
+            <div class="stat-sub">{{ stats.activeClasses }} activas</div>
+          </div>
+        </mat-card>
+
+        <mat-card class="stat-card">
+          <mat-icon class="stat-icon success">people</mat-icon>
+          <div class="stat-content">
+            <div class="stat-number">{{ stats.totalUsers }}</div>
+            <div class="stat-label">Usuarios Registrados</div>
+          </div>
+        </mat-card>
+
+        <mat-card class="stat-card">
+          <mat-icon class="stat-icon warning">event_available</mat-icon>
+          <div class="stat-content">
+            <div class="stat-number">{{ stats.totalReservations }}</div>
+            <div class="stat-label">Reservas Activas</div>
+          </div>
+        </mat-card>
+
+        <mat-card class="stat-card">
+          <mat-icon class="stat-icon info">analytics</mat-icon>
+          <div class="stat-content">
+            <div class="stat-number">{{ stats.occupancyRate }}%</div>
+            <div class="stat-label">Tasa de Ocupación</div>
+          </div>
+        </mat-card>
+      </div>
+
+      <!-- Tabs -->
+      <mat-tab-group class="admin-tabs" animationDuration="300ms">
+        <!-- Tab: Gestión de Clases -->
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <mat-icon>fitness_center</mat-icon>
+            Gestión de Clases
+          </ng-template>
+
+          <div class="tab-content">
+            <div class="table-container">
+              <table mat-table [dataSource]="allClasses" class="admin-table">
+                <!-- Icon Column -->
+                <ng-container matColumnDef="icon">
+                  <th mat-header-cell *matHeaderCellDef></th>
+                  <td mat-cell *matCellDef="let classItem">
+                    <span class="class-emoji">{{ classItem.icon }}</span>
+                  </td>
+                </ng-container>
+
+                <!-- Name Column -->
+                <ng-container matColumnDef="name">
+                  <th mat-header-cell *matHeaderCellDef>Clase</th>
+                  <td mat-cell *matCellDef="let classItem">
+                    <strong>{{ classItem.name }}</strong>
+                  </td>
+                </ng-container>
+
+                <!-- Instructor Column -->
+                <ng-container matColumnDef="instructor">
+                  <th mat-header-cell *matHeaderCellDef>Instructor</th>
+                  <td mat-cell *matCellDef="let classItem">{{ classItem.instructor }}</td>
+                </ng-container>
+
+                <!-- Date Column -->
+                <ng-container matColumnDef="date">
+                  <th mat-header-cell *matHeaderCellDef>Fecha</th>
+                  <td mat-cell *matCellDef="let classItem">{{ formatDate(classItem.date) }}</td>
+                </ng-container>
+
+                <!-- Time Column -->
+                <ng-container matColumnDef="time">
+                  <th mat-header-cell *matHeaderCellDef>Horario</th>
+                  <td mat-cell *matCellDef="let classItem">
+                    {{ classItem.startTime }} - {{ classItem.endTime }}
+                  </td>
+                </ng-container>
+
+                <!-- Total Spots Column -->
+                <ng-container matColumnDef="totalSpots">
+                  <th mat-header-cell *matHeaderCellDef>Cupos</th>
+                  <td mat-cell *matCellDef="let classItem">{{ classItem.totalSpots }}</td>
+                </ng-container>
+
+                <!-- Reserved Column -->
+                <ng-container matColumnDef="reserved">
+                  <th mat-header-cell *matHeaderCellDef>Reservados</th>
+                  <td mat-cell *matCellDef="let classItem">{{ classItem.reservedSpots }}</td>
+                </ng-container>
+
+                <!-- Available Column -->
+                <ng-container matColumnDef="available">
+                  <th mat-header-cell *matHeaderCellDef>Disponibles</th>
+                  <td mat-cell *matCellDef="let classItem">
+                    <mat-chip [class]="getOccupancyColor(getOccupancyPercentage(classItem))">
+                      {{ classItem.availableSpots }}
+                    </mat-chip>
+                  </td>
+                </ng-container>
+
+                <!-- Status Column -->
+                <ng-container matColumnDef="status">
+                  <th mat-header-cell *matHeaderCellDef>Estado</th>
+                  <td mat-cell *matCellDef="let classItem">
+                    <mat-chip [class]="getStatusClass(classItem.status)">
+                      {{ getStatusText(classItem) }}
+                    </mat-chip>
+                  </td>
+                </ng-container>
+
+                <!-- Actions Column -->
+                <ng-container matColumnDef="actions">
+                  <th mat-header-cell *matHeaderCellDef>Acciones</th>
+                  <td mat-cell *matCellDef="let classItem">
+                    <div class="action-buttons">
+                      <button 
+                        mat-icon-button 
+                        color="primary"
+                        (click)="viewClassDetails(classItem)"
+                        matTooltip="Ver detalles">
+                        <mat-icon>visibility</mat-icon>
+                      </button>
+                      <button 
+                        mat-icon-button 
+                        color="accent"
+                        matTooltip="Editar">
+                        <mat-icon>edit</mat-icon>
+                      </button>
+                      <button 
+                        mat-icon-button 
+                        color="warn"
+                        [disabled]="isDeleting(classItem.id!)"
+                        (click)="deleteClass(classItem)"
+                        matTooltip="Eliminar">
+                        @if (isDeleting(classItem.id!)) {
+                          <mat-spinner diameter="20"></mat-spinner>
+                        }
+                        @if (!isDeleting(classItem.id!)) {
+                          <mat-icon>delete</mat-icon>
+                        }
+                      </button>
+                    </div>
+                  </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="classesColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: classesColumns;"></tr>
+              </table>
+            </div>
+          </div>
+        </mat-tab>
+
+        <!-- Tab: Usuarios -->
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <mat-icon>people</mat-icon>
+            Usuarios ({{ allUsers.length }})
+          </ng-template>
+
+          <div class="tab-content">
+            @if (loadingUsers) {
+              <div class="loading-container">
+                <mat-spinner></mat-spinner>
+              </div>
+            }
+
+            @if (!loadingUsers) {
+              <div class="table-container">
+                <table mat-table [dataSource]="allUsers" class="admin-table">
+                  <!-- Name Column -->
+                  <ng-container matColumnDef="name">
+                    <th mat-header-cell *matHeaderCellDef>Usuario</th>
+                    <td mat-cell *matCellDef="let user">
+                      <div class="user-cell">
+                        <mat-icon>account_circle</mat-icon>
+                        <div>
+                          <strong>{{ user.displayName }}</strong>
+                          <div class="user-role">{{ user.role === 'admin' ? 'Administrador' : 'Usuario' }}</div>
+                        </div>
+                      </div>
+                    </td>
+                  </ng-container>
+
+                  <!-- Email Column -->
+                  <ng-container matColumnDef="email">
+                    <th mat-header-cell *matHeaderCellDef>Email</th>
+                    <td mat-cell *matCellDef="let user">{{ user.email }}</td>
+                  </ng-container>
+
+                  <!-- Registered Column -->
+                  <ng-container matColumnDef="registered">
+                    <th mat-header-cell *matHeaderCellDef>Registro</th>
+                    <td mat-cell *matCellDef="let user">{{ formatShortDate(user.createdAt) }}</td>
+                  </ng-container>
+
+                  <!-- Reservations Column -->
+                  <ng-container matColumnDef="reservations">
+                    <th mat-header-cell *matHeaderCellDef>Clases Activas</th>
+                    <td mat-cell *matCellDef="let user">
+                      @if (user.reservationsCount > 0) {
+                        <div class="reservations-chips">
+                          @for (className of user.activeReservations.slice(0, 2); track className) {
+                            <mat-chip class="small-chip">{{ className }}</mat-chip>
+                          }
+                          @if (user.activeReservations.length > 2) {
+                            <span class="more-text">+{{ user.activeReservations.length - 2 }} más</span>
+                          }
+                        </div>
+                      }
+                      @if (user.reservationsCount === 0) {
+                        <span class="no-reservations">Sin reservas</span>
+                      }
+                    </td>
+                  </ng-container>
+
+                  <!-- Status Column -->
+                  <ng-container matColumnDef="status">
+                    <th mat-header-cell *matHeaderCellDef>Estado</th>
+                    <td mat-cell *matCellDef="let user">
+                      <mat-chip [class]="getUserStatusText(user) === 'Activo' ? 'active' : 'inactive'">
+                        {{ getUserStatusText(user) }}
+                      </mat-chip>
+                    </td>
+                  </ng-container>
+
+                  <!-- Last Connection Column -->
+                  <ng-container matColumnDef="lastConnection">
+                    <th mat-header-cell *matHeaderCellDef>Última Conexión</th>
+                    <td mat-cell *matCellDef="let user">{{ getLastConnectionText(user) }}</td>
+                  </ng-container>
+
+                  <tr mat-header-row *matHeaderRowDef="usersColumns"></tr>
+                  <tr mat-row *matRowDef="let row; columns: usersColumns;"></tr>
+                </table>
+              </div>
+            }
+          </div>
+        </mat-tab>
+
+        <!-- Tab: Todas las Reservas -->
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <mat-icon>event_note</mat-icon>
+            Todas las Reservas ({{ allReservations.length }})
+          </ng-template>
+
+          <div class="tab-content">
+            <div class="table-container">
+              <table mat-table [dataSource]="allReservations" class="admin-table">
+                <!-- User Column -->
+                <ng-container matColumnDef="user">
+                  <th mat-header-cell *matHeaderCellDef>Usuario</th>
+                  <td mat-cell *matCellDef="let reservation">
+                    <div class="user-info">
+                      <strong>{{ reservation.userName }}</strong>
+                      <div class="email-text">{{ reservation.userEmail }}</div>
+                    </div>
+                  </td>
+                </ng-container>
+
+                <!-- Class Column -->
+                <ng-container matColumnDef="class">
+                  <th mat-header-cell *matHeaderCellDef>Clase</th>
+                  <td mat-cell *matCellDef="let reservation">{{ reservation.className }}</td>
+                </ng-container>
+
+                <!-- Date Column -->
+                <ng-container matColumnDef="date">
+                  <th mat-header-cell *matHeaderCellDef>Fecha de Clase</th>
+                  <td mat-cell *matCellDef="let reservation">{{ formatDate(reservation.classDate) }}</td>
+                </ng-container>
+
+                <!-- Time Column -->
+                <ng-container matColumnDef="time">
+                  <th mat-header-cell *matHeaderCellDef>Horario</th>
+                  <td mat-cell *matCellDef="let reservation">{{ reservation.classTime }}</td>
+                </ng-container>
+
+                <!-- Reservation Date Column -->
+                <ng-container matColumnDef="reservationDate">
+                  <th mat-header-cell *matHeaderCellDef>Reservada el</th>
+                  <td mat-cell *matCellDef="let reservation">{{ formatShortDate(reservation.reservationDate) }}</td>
+                </ng-container>
+
+                <!-- Status Column -->
+                <ng-container matColumnDef="status">
+                  <th mat-header-cell *matHeaderCellDef>Estado</th>
+                  <td mat-cell *matCellDef="let reservation">
+                    <mat-chip [class]="reservation.status">
+                      {{ reservation.status === 'confirmed' ? 'Confirmada' : reservation.status === 'cancelled' ? 'Cancelada' : 'Completada' }}
+                    </mat-chip>
+                  </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="reservationsColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: reservationsColumns;"></tr>
+              </table>
+            </div>
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+    }
+  </div>
+</div>
+
+<!-- Modal de Detalle de Clase -->
+@if (selectedClass()) {
+  <div class="modal-overlay" (click)="closeClassDetails()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>{{ selectedClass()!.icon }} {{ selectedClass()!.name }}</h2>
+        <button mat-icon-button (click)="closeClassDetails()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="class-detail-grid">
+          <mat-card class="info-card">
+            <h3>Información de la Clase</h3>
+            <div class="info-list">
+              <div class="info-item">
+                <mat-icon>person</mat-icon>
+                <div>
+                  <strong>Instructor:</strong>
+                  <span>{{ selectedClass()!.instructor }}</span>
+                </div>
+              </div>
+              <div class="info-item">
+                <mat-icon>calendar_today</mat-icon>
+                <div>
+                  <strong>Fecha:</strong>
+                  <span>{{ formatDate(selectedClass()!.date) }}</span>
+                </div>
+              </div>
+              <div class="info-item">
+                <mat-icon>schedule</mat-icon>
+                <div>
+                  <strong>Horario:</strong>
+                  <span>{{ selectedClass()!.startTime }} - {{ selectedClass()!.endTime }}</span>
+                </div>
+              </div>
+              <div class="info-item">
+                <mat-icon>event_seat</mat-icon>
+                <div>
+                  <strong>Cupos:</strong>
+                  <span>{{ selectedClass()!.reservedSpots }} / {{ selectedClass()!.totalSpots }}</span>
+                </div>
+              </div>
+              <div class="info-item">
+                <mat-icon>info</mat-icon>
+                <div>
+                  <strong>Descripción:</strong>
+                  <span>{{ selectedClass()!.description }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="occupancy-bar">
+              <div class="occupancy-label">
+                <span>Ocupación</span>
+                <span>{{ getOccupancyPercentage(selectedClass()!) }}%</span>
+              </div>
+              <div class="progress-bar">
+                <div 
+                  class="progress-fill" 
+                  [class]="getOccupancyColor(getOccupancyPercentage(selectedClass()!))"
+                  [style.width.%]="getOccupancyPercentage(selectedClass()!)">
+                </div>
+              </div>
+            </div>
+          </mat-card>
+
+          <mat-card class="participants-card">
+            <h3>Participantes Inscritos ({{ selectedClassReservations.length }})</h3>
+            
+            @if (selectedClassReservations.length === 0) {
+              <div class="empty-participants">
+                <mat-icon>people_outline</mat-icon>
+                <p>No hay participantes inscritos</p>
+              </div>
+            }
+
+            @if (selectedClassReservations.length > 0) {
+              <div class="participants-list">
+                @for (reservation of selectedClassReservations; track reservation.id) {
+                  <div class="participant-item">
+                    <mat-icon>account_circle</mat-icon>
+                    <div class="participant-info">
+                      <strong>{{ reservation.userName }}</strong>
+                      <span class="email-text">{{ reservation.userEmail }}</span>
+                    </div>
+                    <mat-chip class="small-chip confirmed">
+                      Confirmada
+                    </mat-chip>
+                  </div>
+                }
+              </div>
+            }
+          </mat-card>
+        </div>
+      </div>
+    </div>
+  </div>
+}
