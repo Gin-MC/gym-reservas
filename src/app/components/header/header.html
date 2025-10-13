@@ -1,0 +1,124 @@
+<mat-toolbar class="header">
+  <div class="header-container">
+    <!-- Logo y nombre -->
+    <div class="logo-section">
+      <a routerLink="/home" class="logo-link">
+        <span class="logo-icon">🏋️</span>
+        <span class="logo-text">GymReservas</span>
+      </a>
+    </div>
+
+    <!-- Navegación Desktop -->
+    <nav class="nav-menu">
+      @if (isAuthenticated()) {
+        <a 
+          mat-button 
+          routerLink="/home" 
+          routerLinkActive="active-link"
+          [routerLinkActiveOptions]="{exact: false}">
+          <mat-icon>home</mat-icon>
+          Home
+        </a>
+
+        <a 
+          mat-button 
+          routerLink="/my-reservations" 
+          routerLinkActive="active-link">
+          <mat-icon>event</mat-icon>
+          Mis Reservas
+        </a>
+
+        @if (isAdmin()) {
+          <a 
+            mat-button 
+            routerLink="/admin" 
+            routerLinkActive="active-link"
+            class="admin-link">
+            <mat-icon>dashboard</mat-icon>
+            Admin
+          </a>
+        }
+
+        <!-- Menú de usuario -->
+        <button mat-button [matMenuTriggerFor]="userMenu" class="user-button">
+          <mat-icon>account_circle</mat-icon>
+          <span>{{ getUserName() }}</span>
+          <mat-icon>arrow_drop_down</mat-icon>
+        </button>
+
+        <mat-menu #userMenu="matMenu">
+          <button mat-menu-item routerLink="/profile">
+            <mat-icon>person</mat-icon>
+            <span>Perfil</span>
+          </button>
+          <mat-divider></mat-divider>
+          <button mat-menu-item (click)="logout()">
+            <mat-icon>logout</mat-icon>
+            <span>Cerrar Sesión</span>
+          </button>
+        </mat-menu>
+      }
+
+      @if (!isAuthenticated()) {
+        <a mat-button routerLink="/home">
+          <mat-icon>home</mat-icon>
+          Home
+        </a>
+        <a mat-raised-button color="primary" routerLink="/login">
+          Iniciar Sesión
+        </a>
+        <a mat-raised-button color="accent" routerLink="/register">
+          Registrarse
+        </a>
+      }
+    </nav>
+
+    <!-- Menú Mobile (hamburguesa) -->
+    <button mat-icon-button class="mobile-menu-button" [matMenuTriggerFor]="mobileMenu">
+      <mat-icon>menu</mat-icon>
+    </button>
+
+    <mat-menu #mobileMenu="matMenu" class="mobile-menu">
+      @if (isAuthenticated()) {
+        <button mat-menu-item routerLink="/home">
+          <mat-icon>home</mat-icon>
+          <span>Home</span>
+        </button>
+        <button mat-menu-item routerLink="/my-reservations">
+          <mat-icon>event</mat-icon>
+          <span>Mis Reservas</span>
+        </button>
+        @if (isAdmin()) {
+          <button mat-menu-item routerLink="/admin">
+            <mat-icon>dashboard</mat-icon>
+            <span>Admin</span>
+          </button>
+        }
+        <button mat-menu-item routerLink="/profile">
+          <mat-icon>person</mat-icon>
+          <span>Perfil</span>
+        </button>
+        <mat-divider></mat-divider>
+        <button mat-menu-item (click)="logout()">
+          <mat-icon>logout</mat-icon>
+          <span>Cerrar Sesión</span>
+        </button>
+      }
+
+      @if (!isAuthenticated()) {
+        <button mat-menu-item routerLink="/home">
+          <mat-icon>home</mat-icon>
+          <span>Home</span>
+        </button>
+        <button mat-menu-item routerLink="/login">
+          <mat-icon>login</mat-icon>
+          <span>Iniciar Sesión</span>
+        </button>
+        <button mat-menu-item routerLink="/register">
+          <mat-icon>person_add</mat-icon>
+          <span>Registrarse</span>
+        </button>
+      }
+    </mat-menu>
+  </div>
+</mat-toolbar>

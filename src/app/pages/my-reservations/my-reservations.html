@@ -1,0 +1,238 @@
+<div class="reservations-container">
+  <div class="container">
+    <!-- Header -->
+    <div class="page-header">
+      <h1>Mis Reservas</h1>
+      <p class="subtitle">Gestiona tus clases reservadas</p>
+    </div>
+
+    <!-- Loading -->
+    @if (loading) {
+      <div class="loading-container">
+        <mat-spinner></mat-spinner>
+        <p>Cargando tus reservas...</p>
+      </div>
+    }
+
+    <!-- Sin reservas -->
+    @if (!loading && allReservations.length === 0) {
+      <div class="no-reservations">
+        <mat-icon>event_busy</mat-icon>
+        <h3>No tienes reservas</h3>
+        <p>Comienza a reservar tus clases favoritas</p>
+        <button mat-raised-button color="primary" routerLink="/home">
+          <mat-icon>search</mat-icon>
+          Ver Clases Disponibles
+        </button>
+      </div>
+    }
+
+    <!-- Estadísticas -->
+    @if (!loading && allReservations.length > 0) {
+      <div class="stats-grid">
+        <mat-card class="stat-card total">
+          <mat-icon>calendar_month</mat-icon>
+          <div class="stat-content">
+            <div class="stat-number">{{ stats.total }}</div>
+            <div class="stat-label">Total de Reservas</div>
+          </div>
+        </mat-card>
+
+        <mat-card class="stat-card upcoming">
+          <mat-icon>schedule</mat-icon>
+          <div class="stat-content">
+            <div class="stat-number">{{ stats.upcoming }}</div>
+            <div class="stat-label">Próximas</div>
+          </div>
+        </mat-card>
+
+        <mat-card class="stat-card completed">
+          <mat-icon>check_circle</mat-icon>
+          <div class="stat-content">
+            <div class="stat-number">{{ stats.completed }}</div>
+            <div class="stat-label">Completadas</div>
+          </div>
+        </mat-card>
+
+        <mat-card class="stat-card cancelled">
+          <mat-icon>cancel</mat-icon>
+          <div class="stat-content">
+            <div class="stat-number">{{ stats.cancelled }}</div>
+            <div class="stat-label">Canceladas</div>
+          </div>
+        </mat-card>
+      </div>
+
+      <!-- Tabs con reservas -->
+      <mat-tab-group class="reservations-tabs" animationDuration="300ms">
+        <!-- Tab: Próximas -->
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <mat-icon>schedule</mat-icon>
+            Próximas ({{ upcomingReservations.length }})
+          </ng-template>
+
+          <div class="tab-content">
+            @if (upcomingReservations.length === 0) {
+              <div class="empty-state">
+                <mat-icon>event_available</mat-icon>
+                <p>No tienes clases próximas</p>
+              </div>
+            }
+
+            @if (upcomingReservations.length > 0) {
+              <div class="reservations-grid">
+                @for (reservation of upcomingReservations; track reservation.id) {
+                  <mat-card class="reservation-card" [class]="getStatusColor(reservation)">
+                    <mat-card-header>
+                      <mat-icon class="class-icon">fitness_center</mat-icon>
+                      <mat-card-title>{{ reservation.className }}</mat-card-title>
+                      <mat-chip class="status-chip confirmed">
+                        <mat-icon>{{ getStatusIcon(reservation) }}</mat-icon>
+                        {{ getStatusText(reservation) }}
+                      </mat-chip>
+                    </mat-card-header>
+
+                    <mat-card-content>
+                      <div class="reservation-info">
+                        <div class="info-row">
+                          <mat-icon>calendar_today</mat-icon>
+                          <span><strong>Fecha:</strong> {{ formatDate(reservation.classDate) }}</span>
+                        </div>
+                        <div class="info-row">
+                          <mat-icon>schedule</mat-icon>
+                          <span><strong>Horario:</strong> {{ reservation.classTime }}</span>
+                        </div>
+                        <div class="info-row">
+                          <mat-icon>event</mat-icon>
+                          <span><strong>Reservada el:</strong> {{ formatReservationDate(reservation.reservationDate) }}</span>
+                        </div>
+                      </div>
+                    </mat-card-content>
+
+                    <mat-card-actions>
+                      @if (canCancelReservation(reservation)) {
+                        <button 
+                        mat-raised-button 
+                        color="warn" 
+                        class="cancel-button"
+                        [disabled]="isCancelling(reservation.id!)"
+                        (click)="cancelReservation(reservation)">
+                        @if (isCancelling(reservation.id!)) {
+                            <ng-container>
+                            <mat-spinner diameter="20"></mat-spinner>
+                            <span>Cancelando...</span>
+                            </ng-container>
+                        }
+                        @if (!isCancelling(reservation.id!)) {
+                            <ng-container>
+                            <mat-icon>cancel</mat-icon>
+                            <span>Cancelar Reserva</span>
+                            </ng-container>
+                        }
+                        </button>                      }
+                    </mat-card-actions>
+                  </mat-card>
+                }
+              </div>
+            }
+          </div>
+        </mat-tab>
+
+        <!-- Tab: Completadas -->
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <mat-icon>check_circle</mat-icon>
+            Completadas ({{ completedReservations.length }})
+          </ng-template>
+
+          <div class="tab-content">
+            @if (completedReservations.length === 0) {
+              <div class="empty-state">
+                <mat-icon>history</mat-icon>
+                <p>No tienes clases completadas</p>
+              </div>
+            }
+
+            @if (completedReservations.length > 0) {
+              <div class="reservations-grid">
+                @for (reservation of completedReservations; track reservation.id) {
+                  <mat-card class="reservation-card completed">
+                    <mat-card-header>
+                      <mat-icon class="class-icon">fitness_center</mat-icon>
+                      <mat-card-title>{{ reservation.className }}</mat-card-title>
+                      <mat-chip class="status-chip completed">
+                        <mat-icon>check_circle</mat-icon>
+                        Completada
+                      </mat-chip>
+                    </mat-card-header>
+
+                    <mat-card-content>
+                      <div class="reservation-info">
+                        <div class="info-row">
+                          <mat-icon>calendar_today</mat-icon>
+                          <span><strong>Fecha:</strong> {{ formatDate(reservation.classDate) }}</span>
+                        </div>
+                        <div class="info-row">
+                          <mat-icon>schedule</mat-icon>
+                          <span><strong>Horario:</strong> {{ reservation.classTime }}</span>
+                        </div>
+                      </div>
+                    </mat-card-content>
+                  </mat-card>
+                }
+              </div>
+            }
+          </div>
+        </mat-tab>
+
+        <!-- Tab: Canceladas -->
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <mat-icon>cancel</mat-icon>
+            Canceladas ({{ cancelledReservations.length }})
+          </ng-template>
+
+          <div class="tab-content">
+            @if (cancelledReservations.length === 0) {
+              <div class="empty-state">
+                <mat-icon>event_available</mat-icon>
+                <p>No tienes reservas canceladas</p>
+              </div>
+            }
+
+            @if (cancelledReservations.length > 0) {
+              <div class="reservations-grid">
+                @for (reservation of cancelledReservations; track reservation.id) {
+                  <mat-card class="reservation-card cancelled">
+                    <mat-card-header>
+                      <mat-icon class="class-icon">fitness_center</mat-icon>
+                      <mat-card-title>{{ reservation.className }}</mat-card-title>
+                      <mat-chip class="status-chip cancelled">
+                        <mat-icon>cancel</mat-icon>
+                        Cancelada
+                      </mat-chip>
+                    </mat-card-header>
+
+                    <mat-card-content>
+                      <div class="reservation-info">
+                        <div class="info-row">
+                          <mat-icon>calendar_today</mat-icon>
+                          <span><strong>Fecha:</strong> {{ formatDate(reservation.classDate) }}</span>
+                        </div>
+                        <div class="info-row">
+                          <mat-icon>schedule</mat-icon>
+                          <span><strong>Horario:</strong> {{ reservation.classTime }}</span>
+                        </div>
+                      </div>
+                    </mat-card-content>
+                  </mat-card>
+                }
+              </div>
+            }
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+    }
+  </div>
+</div>

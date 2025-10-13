@@ -1,0 +1,127 @@
+<div class="register-container">
+  <mat-card class="register-card">
+    <mat-card-header class="register-header">
+      <mat-card-title class="register-title">
+        <span class="logo">🏋️ GymReservas</span>
+        <h2>Crear Cuenta</h2>
+      </mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+        <!-- Nombre -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Nombre Completo</mat-label>
+          <input 
+            matInput 
+            type="text" 
+            formControlName="displayName" 
+            placeholder="Juan Pérez"
+            autocomplete="name">
+          <mat-icon matPrefix>person</mat-icon>
+          @if (registerForm.get('displayName')?.invalid && registerForm.get('displayName')?.touched) {
+            <mat-error>
+              {{ getErrorMessage('displayName') }}
+            </mat-error>
+          }
+        </mat-form-field>
+
+        <!-- Email -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Email</mat-label>
+          <input 
+            matInput 
+            type="email" 
+            formControlName="email" 
+            placeholder="tu-email@ejemplo.com"
+            autocomplete="email">
+          <mat-icon matPrefix>email</mat-icon>
+          @if (registerForm.get('email')?.invalid && registerForm.get('email')?.touched) {
+            <mat-error>
+              {{ getErrorMessage('email') }}
+            </mat-error>
+          }
+        </mat-form-field>
+
+        <!-- Password -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Contraseña</mat-label>
+          <input 
+            matInput 
+            [type]="hidePassword ? 'password' : 'text'" 
+            formControlName="password"
+            placeholder="••••••••"
+            autocomplete="new-password">
+          <mat-icon matPrefix>lock</mat-icon>
+          <button 
+            mat-icon-button 
+            matSuffix 
+            type="button"
+            (click)="hidePassword = !hidePassword">
+            <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+          @if (registerForm.get('password')?.invalid && registerForm.get('password')?.touched) {
+            <mat-error>
+              {{ getErrorMessage('password') }}
+            </mat-error>
+          }
+          <!-- Hint para ayudar al usuario -->
+          <mat-hint>Debe incluir letras, números y caracteres especiales</mat-hint>
+        </mat-form-field>
+
+        <!-- Confirm Password -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Confirmar Contraseña</mat-label>
+          <input 
+            matInput 
+            [type]="hideConfirmPassword ? 'password' : 'text'" 
+            formControlName="confirmPassword"
+            placeholder="••••••••"
+            autocomplete="new-password">
+          <mat-icon matPrefix>lock</mat-icon>
+          <button 
+            mat-icon-button 
+            matSuffix 
+            type="button"
+            (click)="hideConfirmPassword = !hideConfirmPassword">
+            <mat-icon>{{ hideConfirmPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+          @if ((registerForm.get('confirmPassword')?.invalid && registerForm.get('confirmPassword')?.touched) || hasPasswordMismatch()) {
+            <mat-error>
+              {{ getErrorMessage('confirmPassword') }}
+            </mat-error>
+          }
+        </mat-form-field>
+
+        <!-- Error Message -->
+        @if (errorMessage) {
+          <div class="error-message">
+            <mat-icon>error</mat-icon>
+            {{ errorMessage }}
+          </div>
+        }
+
+        <!-- Submit Button -->
+        <button 
+          mat-raised-button 
+          color="primary" 
+          type="submit" 
+          class="submit-button"
+          [disabled]="loading">
+          @if (loading) {
+            <mat-spinner diameter="20"></mat-spinner>
+          }
+          @if (!loading) {
+            <span>Registrarse</span>
+          }
+        </button>
+
+        <!-- Login Link -->
+        <div class="login-link">
+          ¿Ya tienes cuenta? 
+          <a routerLink="/login">Inicia sesión aquí</a>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

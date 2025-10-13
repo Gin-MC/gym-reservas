@@ -1,1 +1,55 @@
-/* You can add global styles to this file, and also import other style files */
+/* Importar Angular Material */
+@import '@angular/material/prebuilt-themes/indigo-pink.css';
+
+/* Reset básico */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Variables de colores del proyecto */
+:root {
+  --primary-color: #1976D2;
+  --primary-dark: #1565C0;
+  --secondary-color: #FF5722;
+  --secondary-dark: #E64A19;
+  --success-color: #4CAF50;
+  --warning-color: #FF9800;
+  --error-color: #F44336;
+  --background-color: #FAFAFA;
+  --text-color: #212121;
+  --text-secondary: #666;
+}
+
+/* Estilos globales */
+body {
+  font-family: 'Roboto', sans-serif;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+}
+
+/* Clases de utilidad */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.mt-20 {
+  margin-top: 20px;
+}
+
+.mb-20 {
+  margin-bottom: 20px;
+}

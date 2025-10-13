@@ -1,0 +1,120 @@
+<!-- Hero Section (no cambia) -->
+<section class="hero-section">
+  <div class="hero-content">
+    <h1 class="hero-title">Transforma Tu Vida</h1>
+    <p class="hero-subtitle">
+      En GymReservas encontrarás las mejores clases con instructores certificados. 
+      Reserva fácilmente y alcanza tus metas fitness en un ambiente profesional y motivador.
+      ¡Tu mejor versión te está esperando!
+    </p>
+    <button 
+      mat-raised-button 
+      class="hero-cta" 
+      (click)="scrollToClasses()">
+      🏋️ Reserva Tus Clases
+    </button>
+  </div>
+</section>
+
+<!-- Classes Section -->
+<section class="classes-section" id="classes-section">
+  <div class="container">
+    <div class="section-header">
+      <h2>Clases de Esta Semana</h2>
+      <p class="section-subtitle">Encuentra la clase perfecta para ti</p>
+    </div>
+
+    <!-- Week Filter -->
+    <div class="week-filter">
+      @for (day of days; track day) {
+        <button 
+          mat-stroked-button 
+          [class.active]="selectedDay === day"
+          (click)="filterByDay(day)">
+          {{ day }}
+        </button>
+      }
+    </div>
+
+    <!-- Loading -->
+    @if (loading) {
+      <div class="loading-container">
+        <mat-spinner></mat-spinner>
+        <p>Cargando clases...</p>
+      </div>
+    }
+
+    <!-- No classes -->
+    @if (!loading && filteredClasses.length === 0) {
+      <div class="no-classes">
+        <mat-icon>event_busy</mat-icon>
+        <h3>No hay clases disponibles</h3>
+        <p>Próximamente agregaremos más clases</p>
+      </div>
+    }
+
+    <!-- Classes Grid -->
+    @if (!loading && filteredClasses.length > 0) {
+      <div class="classes-grid">
+        @for (classItem of filteredClasses; track classItem.id) {
+          <mat-card class="class-card" [class]="classItem.category">
+            <mat-card-header>
+              <div class="class-icon">{{ classItem.icon }}</div>
+              <mat-card-title>{{ classItem.name }}</mat-card-title>
+            </mat-card-header>
+            
+            <mat-card-content>
+              <div class="class-info">
+                <div class="info-row">
+                  <mat-icon>person</mat-icon>
+                  <span><strong>Instructor:</strong> {{ classItem.instructor }}</span>
+                </div>
+                <div class="info-row">
+                  <mat-icon>calendar_today</mat-icon>
+                  <span><strong>Fecha:</strong> {{ formatDate(classItem.date) }}</span>
+                </div>
+                <div class="info-row">
+                  <mat-icon>schedule</mat-icon>
+                  <span><strong>Horario:</strong> {{ classItem.startTime }} - {{ classItem.endTime }}</span>
+                </div>
+                <div class="info-row description">
+                  <mat-icon>info</mat-icon>
+                  <span>{{ classItem.description }}</span>
+                </div>
+              </div>
+
+              <div class="class-status">
+                <mat-chip [class]="getStatusClass(classItem.availableSpots, classItem.totalSpots)">
+                  {{ classItem.availableSpots }} de {{ classItem.totalSpots }} cupos disponibles
+                </mat-chip>
+                <span class="status-text" [class]="getStatusClass(classItem.availableSpots, classItem.totalSpots)">
+                  {{ getStatusText(classItem.availableSpots) }}
+                </span>
+              </div>
+            </mat-card-content>
+
+            <mat-card-actions>
+              <button 
+                mat-raised-button 
+                color="primary" 
+                class="reserve-button"
+                [disabled]="classItem.availableSpots === 0 || isReserving(classItem.id!)"
+                (click)="reserveClass(classItem)">
+                @if (isReserving(classItem.id!)) {
+                  <mat-spinner diameter="20"></mat-spinner>
+                  <span>Reservando...</span>
+                }
+                @if (!isReserving(classItem.id!) && classItem.availableSpots === 0) {
+                  <span>Sin Cupos</span>
+                }
+                @if (!isReserving(classItem.id!) && classItem.availableSpots > 0) {
+                  <span>Reservar Cupo</span>
+                }
+              </button>
+            </mat-card-actions>
+          </mat-card>
+        }
+      </div>
+    }
+  </div>
+</section>
