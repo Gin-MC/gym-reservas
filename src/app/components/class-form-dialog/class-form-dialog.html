@@ -1,0 +1,170 @@
+<div class="dialog-container">
+  <div class="dialog-header">
+    <h2 mat-dialog-title>
+      <mat-icon>{{ isEditMode ? 'edit' : 'add' }}</mat-icon>
+      {{ isEditMode ? 'Editar Clase' : 'Nueva Clase' }}
+    </h2>
+    <button mat-icon-button (click)="onCancel()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-dialog-content>
+    <form [formGroup]="classForm" class="class-form">
+      <div class="form-row">
+        <!-- Nombre -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Nombre de la Clase</mat-label>
+          <input matInput formControlName="name" placeholder="Ej: Yoga Matutino">
+          <mat-icon matPrefix>fitness_center</mat-icon>
+          @if (classForm.get('name')?.invalid && classForm.get('name')?.touched) {
+            <mat-error>{{ getErrorMessage('name') }}</mat-error>
+          }
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <!-- Descripción -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Descripción</mat-label>
+          <textarea 
+            matInput 
+            formControlName="description" 
+            rows="3"
+            placeholder="Describe la clase y sus beneficios"></textarea>
+          <mat-icon matPrefix>description</mat-icon>
+          @if (classForm.get('description')?.invalid && classForm.get('description')?.touched) {
+            <mat-error>{{ getErrorMessage('description') }}</mat-error>
+          }
+        </mat-form-field>
+      </div>
+
+      <div class="form-row two-columns">
+        <!-- Categoría -->
+        <mat-form-field appearance="outline">
+          <mat-label>Categoría</mat-label>
+          <mat-select formControlName="category">
+            @for (cat of categories; track cat.value) {
+              <mat-option [value]="cat.value">
+                {{ cat.icon }} {{ cat.label }}
+              </mat-option>
+            }
+          </mat-select>
+          <mat-icon matPrefix>category</mat-icon>
+          @if (classForm.get('category')?.invalid && classForm.get('category')?.touched) {
+            <mat-error>{{ getErrorMessage('category') }}</mat-error>
+          }
+        </mat-form-field>
+
+        <!-- Instructor -->
+        <mat-form-field appearance="outline">
+          <mat-label>Instructor</mat-label>
+          <mat-select formControlName="instructor">
+            @for (instructor of instructors; track instructor) {
+              <mat-option [value]="instructor">{{ instructor }}</mat-option>
+            }
+          </mat-select>
+          <mat-icon matPrefix>person</mat-icon>
+          @if (classForm.get('instructor')?.invalid && classForm.get('instructor')?.touched) {
+            <mat-error>{{ getErrorMessage('instructor') }}</mat-error>
+          }
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <!-- Fecha -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Fecha</mat-label>
+          <input 
+            matInput 
+            [matDatepicker]="picker" 
+            formControlName="date"
+            [min]="minDate">
+          <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+          @if (classForm.get('date')?.invalid && classForm.get('date')?.touched) {
+            <mat-error>{{ getErrorMessage('date') }}</mat-error>
+          }
+        </mat-form-field>
+      </div>
+
+      <div class="form-row two-columns">
+        <!-- Hora Inicio -->
+        <mat-form-field appearance="outline">
+          <mat-label>Hora de Inicio</mat-label>
+          <mat-select formControlName="startTime">
+            @for (time of timeSlots; track time) {
+              <mat-option [value]="time">{{ time }}</mat-option>
+            }
+          </mat-select>
+          <mat-icon matPrefix>schedule</mat-icon>
+          @if (classForm.get('startTime')?.invalid && classForm.get('startTime')?.touched) {
+            <mat-error>{{ getErrorMessage('startTime') }}</mat-error>
+          }
+        </mat-form-field>
+
+        <!-- Hora Fin -->
+        <mat-form-field appearance="outline">
+          <mat-label>Hora de Fin</mat-label>
+          <mat-select formControlName="endTime">
+            @for (time of timeSlots; track time) {
+              <mat-option [value]="time">{{ time }}</mat-option>
+            }
+          </mat-select>
+          <mat-icon matPrefix>schedule</mat-icon>
+          @if (classForm.get('endTime')?.invalid && classForm.get('endTime')?.touched) {
+            <mat-error>{{ getErrorMessage('endTime') }}</mat-error>
+          }
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <!-- Cupos Totales -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Cupos Totales</mat-label>
+          <input 
+            matInput 
+            type="number" 
+            formControlName="totalSpots"
+            min="1"
+            max="50"
+            placeholder="Ej: 15">
+          <mat-icon matPrefix>group</mat-icon>
+          @if (classForm.get('totalSpots')?.invalid && classForm.get('totalSpots')?.touched) {
+            <mat-error>{{ getErrorMessage('totalSpots') }}</mat-error>
+          }
+          <mat-hint>Mínimo 1, máximo 50</mat-hint>
+        </mat-form-field>
+      </div>
+
+      <!-- Error Message -->
+      @if (errorMessage) {
+        <div class="error-message">
+          <mat-icon>error</mat-icon>
+          {{ errorMessage }}
+        </div>
+      }
+    </form>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button 
+      mat-button 
+      (click)="onCancel()"
+      [disabled]="loading">
+      Cancelar
+    </button>
+    <button 
+      mat-raised-button 
+      color="primary"
+      (click)="onSubmit()"
+      [disabled]="loading || classForm.invalid">
+      @if (loading) {
+        <mat-spinner diameter="20"></mat-spinner>
+      }
+      @if (!loading) {
+        <span>{{ isEditMode ? 'Actualizar' : 'Crear Clase' }}</span>
+      }
+    </button>
+  </mat-dialog-actions>
+</div>
