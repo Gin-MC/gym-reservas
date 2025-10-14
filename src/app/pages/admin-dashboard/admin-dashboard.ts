@@ -15,11 +15,12 @@ import { ReservationsService } from '../../services/reservations';
 import { Class } from '../../interfaces/class.interface';
 import { Reservation } from '../../interfaces/reservation.interface';
 import { User } from '../../interfaces/user.interface';
-import { Firestore, collection, getDocs } from '@angular/fire/firestore';
+import { Firestore, collection, getDocs, Timestamp } from '@angular/fire/firestore';
 
 interface UserWithReservations extends User {
   reservationsCount: number;
-  activeReservations: string[];
+  activeReservations: string[];  
+  lastConnection?: Date | any; //Revisar es Any porque no me deja poner Date
 }
 
 @Component({
@@ -114,10 +115,17 @@ export class AdminDashboard implements OnInit {
       const usersCollection = collection(this.firestore, 'users');
       const querySnapshot = await getDocs(usersCollection);
       
-      const users: User[] = querySnapshot.docs.map(doc => ({
-        uid: doc.id,
-        ...doc.data()
-      } as User));
+      const users: User[] = querySnapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          uid: doc.id,
+          email: data['email'],
+          displayName: data['displayName'],
+          role: data['role'],
+          createdAt: data['createdAt']?.toDate ? data['createdAt'].toDate() : new Date(data['createdAt']),
+          lastConnection: data['lastConnection']?.toDate ? data['lastConnection'].toDate() : (data['lastConnection'] ? new Date(data['lastConnection']) : null)
+        } as User;
+      });
 
       // Agregar información de reservas a cada usuario
       this.allUsers = users.map(user => {
@@ -198,14 +206,27 @@ export class AdminDashboard implements OnInit {
     }
   }
 
-  formatDate(date: Date): string {
+  formatDate(date: Date | any): string {
+    if (!date) return 'N/A';
+    
+    // Convertir a Date si es necesario
+    const dateObj = date instanceof Date ? date : new Date(date);
+    
+    if (isNaN(dateObj.getTime())) return 'N/A';
+    
     const days = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
     const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
-    return `${days[date.getDay()]}, ${date.getDate()} ${months[date.getMonth()]}`;
+    return `${days[dateObj.getDay()]}, ${dateObj.getDate()} ${months[dateObj.getMonth()]}`;
   }
 
-  formatDateTime(date: Date): string {
-    return date.toLocaleDateString('es-ES', {
+  formatDateTime(date: Date | any): string {
+    if (!date) return 'N/A';
+    
+    const dateObj = date instanceof Date ? date : new Date(date);
+    
+    if (isNaN(dateObj.getTime())) return 'N/A';
+    
+    return dateObj.toLocaleDateString('es-ES', {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',
@@ -214,8 +235,17 @@ export class AdminDashboard implements OnInit {
     });
   }
 
-  formatShortDate(date: Date): string {
-    return date.toLocaleDateString('es-ES', {
+  formatShortDate(date: Date | any): string {
+    if (!date) return 'N/A';
+    
+    // Convertir a Date si es Timestamp de Firebase
+    const dateObj = date instanceof Date ? date : 
+                    date.toDate ? date.toDate() : 
+                    new Date(date);
+    
+    if (isNaN(dateObj.getTime())) return 'N/A';
+    
+    return dateObj.toLocaleDateString('es-ES', {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric'
@@ -250,36 +280,54 @@ export class AdminDashboard implements OnInit {
   getUserStatusText(user: UserWithReservations): string {
     if (!user.lastConnection) return 'Inactivo';
     
-    const now = new Date();
-    const lastConn = user.lastConnection instanceof Date 
-      ? user.lastConnection 
-      : new Date(user.lastConnection as any);
-    
-    const diffDays = Math.floor((now.getTime() - lastConn.getTime()) / (1000 * 60 * 60 * 24));
-    
-    if (diffDays === 0) return 'Activo';
-    if (diffDays <= 7) return 'Activo';
-    return 'Inactivo';
+    try {
+      const now = new Date();
+      const lastConnRaw: any = user.lastConnection;
+      const lastConn = lastConnRaw instanceof Date 
+        ? lastConnRaw 
+        : lastConnRaw?.toDate 
+          ? lastConnRaw.toDate() 
+          : new Date(lastConnRaw);
+      
+      if (isNaN(lastConn.getTime())) return 'Inactivo';
+      
+      const diffDays = Math.floor((now.getTime() - lastConn.getTime()) / (1000 * 60 * 60 * 24));
+      
+      if (diffDays === 0) return 'Activo';
+      if (diffDays <= 7) return 'Activo';
+      return 'Inactivo';
+    } catch (error) {
+      return 'Inactivo';
+    }
   }
 
   getLastConnectionText(user: UserWithReservations): string {
     if (!user.lastConnection) return 'Nunca';
     
-    const lastConn = user.lastConnection instanceof Date 
-      ? user.lastConnection 
-      : new Date(user.lastConnection as any);
-    
-    const now = new Date();
-    const diffMinutes = Math.floor((now.getTime() - lastConn.getTime()) / (1000 * 60));
-    
-    if (diffMinutes < 60) return `Hace ${diffMinutes} min`;
-    
-    const diffHours = Math.floor(diffMinutes / 60);
-    if (diffHours < 24) return `Hace ${diffHours} hora${diffHours !== 1 ? 's' : ''}`;
-    
-    const diffDays = Math.floor(diffHours / 24);
-    if (diffDays < 30) return `Hace ${diffDays} día${diffDays !== 1 ? 's' : ''}`;
-    
-    return lastConn.toLocaleDateString('es-ES');
+    try {
+      const lastConnRaw: any = user.lastConnection;
+      const lastConn = lastConnRaw instanceof Date 
+        ? lastConnRaw 
+        : lastConnRaw?.toDate 
+          ? lastConnRaw.toDate() 
+          : new Date(lastConnRaw);
+      
+      if (isNaN(lastConn.getTime())) return 'N/A';
+      
+      const now = new Date();
+      const diffMinutes = Math.floor((now.getTime() - lastConn.getTime()) / (1000 * 60));
+      
+      if (diffMinutes < 60) return `Hace ${diffMinutes} min`;
+      
+      const diffHours = Math.floor(diffMinutes / 60);
+      if (diffHours < 24) return `Hace ${diffHours} hora${diffHours !== 1 ? 's' : ''}`;
+      
+      const diffDays = Math.floor(diffHours / 24);
+      if (diffDays < 30) return `Hace ${diffDays} día${diffDays !== 1 ? 's' : ''}`;
+      
+      return lastConn.toLocaleDateString('es-ES');
+    } catch (error) {
+      return 'N/A';
+    }
   }
 }
