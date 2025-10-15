@@ -6,7 +6,11 @@
         <h1>Panel de Administración</h1>
         <p class="subtitle">Gestión completa del gimnasio</p>
       </div>
-      <button mat-raised-button color="primary" class="create-button">
+      <button 
+        mat-raised-button 
+        color="primary" 
+        class="create-button"
+        (click)="openCreateClassDialog()">
         <mat-icon>add</mat-icon>
         Nueva Clase
       </button>
@@ -152,6 +156,7 @@
                       <button 
                         mat-icon-button 
                         color="accent"
+                        (click)="openEditClassDialog(classItem)"
                         matTooltip="Editar">
                         <mat-icon>edit</mat-icon>
                       </button>

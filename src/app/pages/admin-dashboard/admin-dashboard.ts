@@ -1,5 +1,5 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -15,7 +15,8 @@ import { ReservationsService } from '../../services/reservations';
 import { Class } from '../../interfaces/class.interface';
 import { Reservation } from '../../interfaces/reservation.interface';
 import { User } from '../../interfaces/user.interface';
-import { Firestore, collection, getDocs, Timestamp } from '@angular/fire/firestore';
+import { Firestore, collection, getDocs} from '@angular/fire/firestore';
+import { ClassFormDialog } from '../../components/class-form-dialog/class-form-dialog';
 
 interface UserWithReservations extends User {
   reservationsCount: number;
@@ -27,7 +28,6 @@ interface UserWithReservations extends User {
   selector: 'app-admin-dashboard',
   standalone: true,
   imports: [
-    // RouterLink,
     MatCardModule,
     MatButtonModule,
     MatIconModule,
@@ -36,7 +36,8 @@ interface UserWithReservations extends User {
     MatProgressSpinnerModule,
     MatTabsModule,
     MatDialogModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    ClassFormDialog //Revisar esta parte como poder hacerlo de otra manera
   ],
   templateUrl: './admin-dashboard.html',
   styleUrl: './admin-dashboard.css'
@@ -329,5 +330,59 @@ export class AdminDashboard implements OnInit {
     } catch (error) {
       return 'N/A';
     }
+  }
+
+    // Función para abrir el diálogo de creación de clase
+    openCreateClassDialog() {
+    const dialogRef = this.dialog.open(ClassFormDialog, {
+      width: '600px',
+      maxWidth: '90vw',
+      disableClose: true,
+      data: {}
+    });
+
+    dialogRef.afterClosed().subscribe(async (result) => {
+      if (result?.success) {
+        if (result.action === 'create') {
+          this.snackBar.open('Clase creada exitosamente', 'Cerrar', {
+            duration: 3000,
+            panelClass: ['success-snackbar']
+          });
+        }
+        // Recargar datos
+        await this.loadClasses();
+        this.calculateStats();
+      }
+    });
+  }
+
+  openEditClassDialog(classItem: Class) {
+    const dialogRef = this.dialog.open(ClassFormDialog, {
+      width: '600px',
+      maxWidth: '90vw',
+      disableClose: true,
+      data: { class: classItem }
+    });
+
+    dialogRef.afterClosed().subscribe(async (result) => {
+      if (result?.success) {
+        if (result.action === 'update') {
+          this.snackBar.open('Clase actualizada exitosamente', 'Cerrar', {
+            duration: 3000,
+            panelClass: ['success-snackbar']
+          });
+        }
+        // Recargar datos
+        await this.loadClasses();
+        this.calculateStats();
+        // Si está viendo detalles de esta clase, actualizar
+        if (this.selectedClass()?.id === classItem.id) {
+          const updatedClass = await this.classesService.getClassById(classItem.id!);
+          if (updatedClass) {
+            this.selectedClass.set(updatedClass);
+          }
+        }
+      }
+    });
   }
 }
