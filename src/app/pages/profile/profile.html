@@ -1,1 +1,270 @@
-<p>profile works!</p>
+<div class="profile-container">
+  <div class="container">
+    <!-- Header -->
+    <div class="page-header">
+      <div class="user-header">
+        <div class="avatar">
+          <mat-icon>account_circle</mat-icon>
+        </div>
+        <div class="user-info">
+          <h1>{{ currentUser?.displayName }}</h1>
+          <p class="email">{{ currentUser?.email }}</p>
+          <span class="role-badge" [class]="getRoleColor()">
+            {{ getRoleBadge() }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="content-grid">
+      <!-- Columna izquierda: Estadísticas -->
+      <div class="stats-column">
+        <mat-card class="stats-card">
+          <h2>📊 Mis Estadísticas</h2>
+          <mat-divider></mat-divider>
+
+          @if (loadingStats) {
+            <div class="loading-stats">
+              <mat-spinner diameter="40"></mat-spinner>
+            </div>
+          }
+
+          @if (!loadingStats) {
+            <div class="stats-list">
+              <div class="stat-item">
+                <div class="stat-icon">
+                  <mat-icon>event_available</mat-icon>
+                </div>
+                <div class="stat-content">
+                  <div class="stat-value">{{ stats.totalReservations }}</div>
+                  <div class="stat-label">Total de Reservas</div>
+                </div>
+              </div>
+
+              <div class="stat-item">
+                <div class="stat-icon upcoming">
+                  <mat-icon>schedule</mat-icon>
+                </div>
+                <div class="stat-content">
+                  <div class="stat-value">{{ stats.upcomingReservations }}</div>
+                  <div class="stat-label">Próximas Clases</div>
+                </div>
+              </div>
+
+              <div class="stat-item">
+                <div class="stat-icon completed">
+                  <mat-icon>check_circle</mat-icon>
+                </div>
+                <div class="stat-content">
+                  <div class="stat-value">{{ stats.completedReservations }}</div>
+                  <div class="stat-label">Clases Completadas</div>
+                </div>
+              </div>
+
+              <div class="stat-item">
+                <div class="stat-icon cancelled">
+                  <mat-icon>cancel</mat-icon>
+                </div>
+                <div class="stat-content">
+                  <div class="stat-value">{{ stats.cancelledReservations }}</div>
+                  <div class="stat-label">Canceladas</div>
+                </div>
+              </div>
+            </div>
+
+            <mat-divider></mat-divider>
+
+            <div class="info-list">
+              <div class="info-item">
+                <mat-icon>event</mat-icon>
+                <div>
+                  <strong>Miembro desde:</strong>
+                  <span>{{ stats.memberSince || 'N/A' }}</span>
+                </div>
+              </div>
+              <div class="info-item">
+                <mat-icon>access_time</mat-icon>
+                <div>
+                  <strong>Última conexión:</strong>
+                  <span>{{ stats.lastConnection || 'N/A' }}</span>
+                </div>
+              </div>
+            </div>
+          }
+        </mat-card>
+
+        <!-- Botón de cerrar sesión -->
+        <button 
+          mat-raised-button 
+          color="warn" 
+          class="logout-button"
+          (click)="authService.logout()">
+          <mat-icon>logout</mat-icon>
+          Cerrar Sesión
+        </button>
+      </div>
+
+      <!-- Columna derecha: Formularios -->
+      <div class="forms-column">
+        <mat-tab-group class="profile-tabs">
+          <!-- Tab: Información Personal -->
+          <mat-tab>
+            <ng-template mat-tab-label>
+              <mat-icon>person</mat-icon>
+              Información Personal
+            </ng-template>
+
+            <div class="tab-content">
+              <form [formGroup]="profileForm" (ngSubmit)="updateProfile()">
+                <mat-card class="form-card">
+                  <h3>Editar Perfil</h3>
+                  <mat-divider></mat-divider>
+
+                  <!-- Nombre -->
+                  <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Nombre Completo</mat-label>
+                    <input matInput formControlName="displayName">
+                    <mat-icon matPrefix>person</mat-icon>
+                    @if (profileForm.get('displayName')?.invalid && profileForm.get('displayName')?.touched) {
+                      <mat-error>
+                        {{ getErrorMessage(profileForm, 'displayName') }}
+                      </mat-error>
+                    }
+                  </mat-form-field>
+
+                  <!-- Email (disabled) -->
+                  <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Email</mat-label>
+                    <input matInput formControlName="email">
+                    <mat-icon matPrefix>email</mat-icon>
+                    <mat-hint>El email no se puede modificar</mat-hint>
+                  </mat-form-field>
+
+                  <!-- Botón -->
+                  <div class="form-actions">
+                    <button 
+                      mat-raised-button 
+                      color="primary" 
+                      type="submit"
+                      [disabled]="loadingProfile || profileForm.invalid">
+                      @if (loadingProfile) {
+                        <mat-spinner diameter="20"></mat-spinner>
+                        <span>Guardando...</span>
+                      }
+                      @if (!loadingProfile) {
+                        <mat-icon>save</mat-icon>
+                        <span>Guardar Cambios</span>
+                      }
+                    </button>
+                  </div>
+                </mat-card>
+              </form>
+            </div>
+          </mat-tab>
+
+          <!-- Tab: Cambiar Contraseña -->
+          <mat-tab>
+            <ng-template mat-tab-label>
+              <mat-icon>lock</mat-icon>
+              Cambiar Contraseña
+            </ng-template>
+
+            <div class="tab-content">
+              <form [formGroup]="passwordForm" (ngSubmit)="changePassword()">
+                <mat-card class="form-card">
+                  <h3>Cambiar Contraseña</h3>
+                  <mat-divider></mat-divider>
+
+                  <!-- Contraseña Actual -->
+                  <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Contraseña Actual</mat-label>
+                    <input 
+                      matInput 
+                      [type]="hideCurrentPassword ? 'password' : 'text'"
+                      formControlName="currentPassword">
+                    <mat-icon matPrefix>lock</mat-icon>
+                    <button 
+                      mat-icon-button 
+                      matSuffix 
+                      type="button"
+                      (click)="hideCurrentPassword = !hideCurrentPassword">
+                      <mat-icon>{{ hideCurrentPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+                    </button>
+                    @if (passwordForm.get('currentPassword')?.invalid && passwordForm.get('currentPassword')?.touched) {
+                      <mat-error>
+                        {{ getErrorMessage(passwordForm, 'currentPassword') }}
+                      </mat-error>
+                    }
+                  </mat-form-field>
+
+                  <!-- Nueva Contraseña -->
+                  <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Nueva Contraseña</mat-label>
+                    <input 
+                      matInput 
+                      [type]="hideNewPassword ? 'password' : 'text'"
+                      formControlName="newPassword">
+                    <mat-icon matPrefix>lock</mat-icon>
+                    <button 
+                      mat-icon-button 
+                      matSuffix 
+                      type="button"
+                      (click)="hideNewPassword = !hideNewPassword">
+                      <mat-icon>{{ hideNewPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+                    </button>
+                    @if (passwordForm.get('newPassword')?.invalid && passwordForm.get('newPassword')?.touched) {
+                      <mat-error>
+                        {{ getErrorMessage(passwordForm, 'newPassword') }}
+                      </mat-error>
+                    }
+                    <mat-hint>Mínimo 6 caracteres</mat-hint>
+                  </mat-form-field>
+
+                  <!-- Confirmar Contraseña -->
+                  <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Confirmar Nueva Contraseña</mat-label>
+                    <input 
+                      matInput 
+                      [type]="hideConfirmPassword ? 'password' : 'text'"
+                      formControlName="confirmPassword">
+                    <mat-icon matPrefix>lock</mat-icon>
+                    <button 
+                      mat-icon-button 
+                      matSuffix 
+                      type="button"
+                      (click)="hideConfirmPassword = !hideConfirmPassword">
+                      <mat-icon>{{ hideConfirmPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+                    </button>
+                    @if (passwordForm.get('confirmPassword')?.invalid && passwordForm.get('confirmPassword')?.touched) {
+                      <mat-error>
+                        {{ getErrorMessage(passwordForm, 'confirmPassword') }}
+                      </mat-error>
+                    }
+                  </mat-form-field>
+
+                  <!-- Botón -->
+                  <div class="form-actions">
+                    <button 
+                      mat-raised-button 
+                      color="primary" 
+                      type="submit"
+                      [disabled]="loadingPassword || passwordForm.invalid">
+                      @if (loadingPassword) {
+                        <mat-spinner diameter="20"></mat-spinner>
+                        <span>Cambiando...</span>
+                      }
+                      @if (!loadingPassword) {
+                        <mat-icon>save</mat-icon>
+                        <span>Cambiar Contraseña</span>
+                      }
+                    </button>
+                  </div>
+                </mat-card>
+              </form>
+            </div>
+          </mat-tab>
+        </mat-tab-group>
+      </div>
+    </div>
+  </div>
+</div>
