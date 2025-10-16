@@ -99,8 +99,10 @@
           color="warn" 
           class="logout-button"
           (click)="authService.logout()">
-          <mat-icon>logout</mat-icon>
-          Cerrar Sesión
+          <ng-container>
+            <mat-icon>logout</mat-icon>
+            <span>Cerrar Sesión</span>
+          </ng-container>
         </button>
       </div>
 
@@ -152,8 +154,10 @@
                         <span>Guardando...</span>
                       }
                       @if (!loadingProfile) {
-                        <mat-icon>save</mat-icon>
-                        <span>Guardar Cambios</span>
+                        <ng-container>
+                          <mat-icon>save</mat-icon>
+                          <span>Guardar Cambios</span>
+                        </ng-container>
                       }
                     </button>
                   </div>
@@ -254,8 +258,10 @@
                         <span>Cambiando...</span>
                       }
                       @if (!loadingPassword) {
-                        <mat-icon>save</mat-icon>
-                        <span>Cambiar Contraseña</span>
+                        <ng-container>
+                          <mat-icon>save</mat-icon>
+                          <span>Cambiar Contraseña</span>
+                        </ng-container>
                       }
                     </button>
                   </div>

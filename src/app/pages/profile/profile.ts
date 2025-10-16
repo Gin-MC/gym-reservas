@@ -36,7 +36,7 @@ import { Reservation } from '../../interfaces/reservation.interface';
 })
 export class Profile implements OnInit {
   private fb = inject(FormBuilder);
-  private authService = inject(AuthService);
+  public authService = inject(AuthService);
   private reservationsService = inject(ReservationsService);
   private firestore = inject(Firestore);
   private auth = inject(Auth);

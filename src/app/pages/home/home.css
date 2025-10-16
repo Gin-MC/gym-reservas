@@ -1,66 +1,169 @@
 /* Hero Section */
 .hero-section {
-  background: linear-gradient(rgba(25, 118, 210, 0.85), rgba(25, 118, 210, 0.85)), 
-              url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=1600&q=80');
-  background-size: cover;
-  background-position: center;
+  min-height: 100vh;
+  background: linear-gradient(to right, #1976D2, #2196F3);
   color: white;
-  padding: 120px 20px;
-  text-align: center;
+  padding: 0;
   position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  overflow: hidden;
+}
+
+.hero-section > div {
+  flex: 1;
 }
 
 .hero-content {
-  max-width: 800px;
-  margin: 0 auto;
-  position: relative;
-  z-index: 2;
+  padding: 60px;
+  max-width: 600px;
+  text-align: left;
+  margin-left: 10%;
+}
+
+.hero-section img {
+  object-fit: contain;
+  height: 80%;
+  max-height: 80vh;
+  width: auto;
+  margin-right: 5%;
+  filter: drop-shadow(-20px 0 20px rgba(0, 0, 0, 0.2));
+  transform: scale(1.05);
+  transition: transform 0.3s ease;
 }
 
 .hero-title {
-  font-size: 56px;
-  font-weight: bold;
+  font-size: 64px;
+  font-weight: 800;
   margin-bottom: 24px;
-  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
-  animation: fadeInUp 0.8s ease-out;
+  line-height: 1.1;
+  position: relative;
+  animation: slideFromLeft 0.8s ease-out;
+}
+
+.hero-title::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -10px;
+  width: 100px;
+  height: 4px;
+  background-color: #FF5722;
+  animation: expandWidth 1s ease-out 0.8s forwards;
 }
 
 .hero-subtitle {
   font-size: 20px;
   margin-bottom: 40px;
-  line-height: 1.6;
-  opacity: 0.95;
-  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.3);
-  animation: fadeInUp 1s ease-out;
+  line-height: 1.8;
+  opacity: 0.9;
+  max-width: 90%;
+  animation: slideFromLeft 1s ease-out 0.2s;
 }
 
-.hero-cta {
-  background: #FF5722 !important;
-  color: white !important;
-  padding: 18px 48px !important;
-  font-size: 20px !important;
-  font-weight: 600 !important;
-  border-radius: 30px !important;
+.hero-section .hero-content .mat-mdc-raised-button.hero-cta {
+  background-color: #FF5722;
+  color: white;
+  padding: 24px 56px;
+  font-size: 22px;
+  font-weight: 700;
+  border-radius: 35px;
   text-transform: uppercase;
-  box-shadow: 0 8px 24px rgba(255, 87, 34, 0.4) !important;
-  transition: all 0.3s ease !important;
-  animation: fadeInUp 1.2s ease-out;
+  box-shadow: 0 10px 30px rgba(255, 87, 34, 0.5);
+  transition: all 0.3s ease;
+  animation: slideFromLeft 1.2s ease-out 0.4s;
+  opacity: 0;
+  animation-fill-mode: forwards;
+  letter-spacing: 0.5px;
 }
 
-.hero-cta:hover {
-  background: #E64A19 !important;
-  transform: translateY(-3px);
-  box-shadow: 0 12px 32px rgba(255, 87, 34, 0.5) !important;
+.hero-section .hero-content .mat-mdc-raised-button.hero-cta:hover {
+  background-color: #E64A19;
+  transform: translateY(-5px) scale(1.05);
+  box-shadow: 0 15px 40px rgba(255, 87, 34, 0.6);
 }
 
-@keyframes fadeInUp {
+@keyframes slideFromLeft {
   from {
     opacity: 0;
-    transform: translateY(30px);
+    transform: translateX(-50px);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateX(0);
+  }
+}
+
+@keyframes expandWidth {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100px;
+  }
+}
+
+/* Responsive styles for hero section */
+@media (max-width: 1200px) {
+  .hero-content {
+    margin-left: 5%;
+  }
+  
+  .hero-title {
+    font-size: 48px;
+  }
+}
+
+@media (max-width: 960px) {
+  .hero-section {
+    flex-direction: column;
+    padding: 40px 20px;
+  }
+
+  .hero-content {
+    margin: 0;
+    padding: 40px 20px;
+    text-align: center;
+    order: 2;
+  }
+
+  .hero-title::after {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .hero-subtitle {
+    margin: 20px auto 30px;
+    max-width: 100%;
+  }
+
+  .hero-section img {
+    max-height: 50vh;
+    width: 100%;
+    object-fit: contain;
+    margin: 0;
+    order: 1;
+  }
+}
+
+@media (max-width: 600px) {
+  .hero-title {
+    font-size: 36px;
+  }
+
+  .hero-subtitle {
+    font-size: 16px;
+  }
+
+  .hero-section .hero-content .mat-mdc-raised-button.hero-cta {
+    padding: 20px 40px;
+    font-size: 18px;
+  }
+
+  .hero-section img {
+    max-height: 40vh;
+    margin: 20px 0;
   }
 }
 
@@ -250,9 +353,9 @@
     font-size: 16px;
   }
 
-  .hero-cta {
-    padding: 14px 32px !important;
-    font-size: 16px !important;
+  .hero-section .hero-content .mat-mdc-raised-button.hero-cta {
+    padding: 14px 32px;
+    font-size: 16px;
   }
 
   .classes-grid {

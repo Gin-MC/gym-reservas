@@ -1,0 +1,287 @@
+.profile-container {
+  padding: 24px;
+  min-height: calc(100vh - 64px);
+  background-color: #f5f5f5;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Estilos del encabezado */
+.page-header {
+  margin-bottom: 32px;
+}
+
+.user-header {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 20px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background-color: #e0e0e0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar mat-icon {
+  font-size: 48px;
+  width: 48px;
+  height: 48px;
+  color: #616161;
+}
+
+.user-info {
+  flex: 1;
+}
+
+.user-info h1 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 500;
+  color: #333;
+}
+
+.email {
+  margin: 4px 0;
+  color: #666;
+}
+
+.role-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.role-badge.admin {
+  background-color: #ffd740;
+  color: #000;
+}
+
+.role-badge.user {
+  background-color: #90caf9;
+  color: #000;
+}
+
+/* Grid de contenido */
+.content-grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 24px;
+}
+
+/* Columna de estadísticas */
+.stats-column {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.stats-card {
+  padding: 24px;
+}
+
+.stats-card h2 {
+  margin: 0 0 16px 0;
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.loading-stats {
+  display: flex;
+  justify-content: center;
+  padding: 32px 0;
+}
+
+.stats-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin: 20px 0;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+}
+
+.stat-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #e3f2fd;
+}
+
+.stat-icon.upcoming {
+  background-color: #fff3e0;
+}
+
+.stat-icon.completed {
+  background-color: #e8f5e9;
+}
+
+.stat-icon.cancelled {
+  background-color: #ffebee;
+}
+
+.stat-icon mat-icon {
+  color: #1976d2;
+}
+
+.stat-icon.upcoming mat-icon {
+  color: #f57c00;
+}
+
+.stat-icon.completed mat-icon {
+  color: #43a047;
+}
+
+.stat-icon.cancelled mat-icon {
+  color: #e53935;
+}
+
+.stat-content {
+  flex: 1;
+}
+
+.stat-value {
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.stat-label {
+  font-size: 14px;
+  color: #666;
+}
+
+.info-list {
+  margin-top: 20px;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+}
+
+.info-item mat-icon {
+  color: #666;
+}
+
+.info-item strong {
+  margin-right: 8px;
+}
+
+/* Botón de cerrar sesión */
+.logout-button {
+  width: 100%;
+  margin-top: 16px;
+  padding: 8px 0;
+}
+
+.logout-button mat-icon {
+  margin-right: 8px;
+}
+
+/* Columna de formularios */
+.forms-column {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.profile-tabs {
+  height: 100%;
+}
+
+.tab-content {
+  padding: 24px;
+}
+
+.form-card {
+  padding: 24px;
+  box-shadow: none !important;
+}
+
+.form-card h3 {
+  margin: 0 0 16px 0;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.full-width {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 24px;
+}
+
+.form-actions button {
+  min-width: 150px;
+}
+
+.form-actions mat-spinner {
+  margin-right: 8px;
+}
+
+/* Responsive */
+@media (max-width: 960px) {
+  .content-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .stats-list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .profile-container {
+    padding: 16px;
+  }
+
+  .user-header {
+    flex-direction: column;
+    text-align: center;
+    gap: 16px;
+  }
+
+  .stats-list {
+    grid-template-columns: 1fr;
+  }
+
+  .stat-item {
+    padding: 12px;
+  }
+
+  .form-card {
+    padding: 16px;
+  }
+}
