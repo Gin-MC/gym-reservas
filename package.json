@@ -4,11 +4,9 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build --configuration production",
+    "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test",
-    "prestart": "cross-env NODE_ENV=development ts-node set-env.ts",
-    "prebuild": "cross-env NODE_ENV=production ts-node set-env.ts"
+    "test": "ng test"
   },
   "prettier": {
     "printWidth": 100,
@@ -43,15 +41,12 @@
     "@angular/cli": "^20.3.3",
     "@angular/compiler-cli": "^20.3.0",
     "@types/jasmine": "~5.1.0",
-    "cross-env": "^10.1.0",
-    "dotenv": "^17.2.3",
     "jasmine-core": "~5.9.0",
     "karma": "~6.4.0",
     "karma-chrome-launcher": "~3.2.0",
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
-    "ts-node": "^10.9.2",
     "typescript": "~5.9.2"
   },
   "description": "This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.3.",
