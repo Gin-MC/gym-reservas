@@ -43,20 +43,20 @@ export class Register {
       password: ['', [
         Validators.required, 
         Validators.minLength(6),
-        this.strongPasswordValidator() // 👈 Nuevo validador
+        this.strongPasswordValidator()
       ]],
       confirmPassword: ['', [Validators.required]]
     }, {
-      validators: this.passwordMatchValidator
+      validator: this.passwordMatchValidator.bind(this)
     });
 
-    // 👇 Escuchar cambios en password para revalidar confirmPassword
+    // Escuchar cambios en password para revalidar confirmPassword
     this.registerForm.get('password')?.valueChanges.subscribe(() => {
       this.registerForm.get('confirmPassword')?.updateValueAndValidity();
     });
   }
 
-  // 🆕 Validador de contraseña fuerte
+  // Validador de contraseña fuerte
   strongPasswordValidator(): ValidatorFn {
     return (control: AbstractControl): ValidationErrors | null => {
       const value = control.value;
@@ -90,12 +90,17 @@ export class Register {
       return null;
     }
 
-    // Solo validar si confirmPassword tiene valor
-    if (confirmPassword.value === '') {
+    if (confirmPassword.errors && !confirmPassword.errors['passwordMismatch']) {
       return null;
     }
 
-    return password.value === confirmPassword.value ? null : { passwordMismatch: true };
+    if (password.value !== confirmPassword.value) {
+      confirmPassword.setErrors({ passwordMismatch: true });
+      return { passwordMismatch: true };
+    } else {
+      confirmPassword.setErrors(null);
+      return null;
+    }
   }
 
   async onSubmit() {
@@ -137,7 +142,7 @@ export class Register {
       return `Mínimo ${minLength} caracteres`;
     }
     
-    // 🆕 Error de contraseña fuerte
+    // Error de contraseña fuerte
     if (field === 'password' && control?.hasError('strongPassword')) {
       const errors = control.errors?.['strongPassword'];
       const missing = [];
@@ -151,7 +156,8 @@ export class Register {
     
     // Error de coincidencia de contraseñas
     if (field === 'confirmPassword') {
-      if (this.registerForm.hasError('passwordMismatch') && control?.touched && control.value !== '') {
+      const confirmPassword = this.registerForm.get('confirmPassword');
+      if (confirmPassword?.errors?.['passwordMismatch']) {
         return 'Las contraseñas no coinciden';
       }
     }
@@ -159,11 +165,9 @@ export class Register {
     return '';
   }
 
-  // 🆕 Método para verificar si hay error de coincidencia
+  // Método para verificar si hay error de coincidencia
   hasPasswordMismatch(): boolean {
     const confirmPassword = this.registerForm.get('confirmPassword');
-    return this.registerForm.hasError('passwordMismatch') && 
-           confirmPassword?.touched === true && 
-           confirmPassword?.value !== '';
+    return confirmPassword?.touched === true && this.registerForm.hasError('passwordMismatch');
   }
 }

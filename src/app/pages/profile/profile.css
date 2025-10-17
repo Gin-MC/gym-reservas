@@ -223,7 +223,7 @@
 
 .form-card {
   padding: 24px;
-  box-shadow: none !important;
+  box-shadow: none ;
 }
 
 .form-card h3 {
@@ -243,12 +243,59 @@
   margin-top: 24px;
 }
 
-.form-actions button {
-  min-width: 150px;
+.action-button {
+  min-width: 200px;
+  height: 48px;
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  position: relative;
+  border-radius: 24px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16);
+  transition: all 0.3s ease;
+  padding: 0 32px;
 }
 
-.form-actions mat-spinner {
-  margin-right: 8px;
+.action-button:hover:not([disabled]) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.action-button .button-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  white-space: nowrap;
+}
+
+.action-button mat-icon {
+  width: 24px;
+  height: 24px;
+  font-size: 24px;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.action-button span {
+  line-height: 24px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.action-button mat-spinner {
+  margin: 0;
+}
+
+.action-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
 }
 
 /* Responsive */
@@ -284,4 +331,51 @@
   .form-card {
     padding: 16px;
   }
+}
+
+/* Estilos del botón de cerrar sesión */
+.logout-button {
+  width: 100%;
+  margin-top: 16px;
+  height: 48px;
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  position: relative;
+  border-radius: 24px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16);
+  transition: all 0.3s ease;
+}
+
+.logout-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.logout-button .button-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  white-space: nowrap;
+}
+
+.logout-button mat-icon {
+  width: 24px;
+  height: 24px;
+  font-size: 24px;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logout-button span {
+  line-height: 24px;
+  display: inline-block;
+  vertical-align: middle;
 }

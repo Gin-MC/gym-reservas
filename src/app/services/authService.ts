@@ -95,7 +95,7 @@ export class AuthService {
     }
   }
 
-  // 🆕 Login con Google
+  // Login con Google
   async loginWithGoogle() {
     try {
       const provider = new GoogleAuthProvider();

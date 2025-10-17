@@ -14,7 +14,6 @@ import { AuthService } from '../../services/authService';
 import { ReservationsService } from '../../services/reservations';
 import { Firestore, doc, updateDoc } from '@angular/fire/firestore';
 import { Auth, updatePassword, EmailAuthProvider, reauthenticateWithCredential } from '@angular/fire/auth';
-import { Reservation } from '../../interfaces/reservation.interface';
 
 @Component({
   selector: 'app-profile',
@@ -36,7 +35,7 @@ import { Reservation } from '../../interfaces/reservation.interface';
 })
 export class Profile implements OnInit {
   private fb = inject(FormBuilder);
-  public authService = inject(AuthService);
+  public authService = inject(AuthService);//Revisar aqui
   private reservationsService = inject(ReservationsService);
   private firestore = inject(Firestore);
   private auth = inject(Auth);

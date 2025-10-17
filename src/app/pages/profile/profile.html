@@ -99,10 +99,10 @@
           color="warn" 
           class="logout-button"
           (click)="authService.logout()">
-          <ng-container>
+          <div class="button-content">
             <mat-icon>logout</mat-icon>
             <span>Cerrar Sesión</span>
-          </ng-container>
+          </div>
         </button>
       </div>
 
@@ -148,16 +148,19 @@
                       mat-raised-button 
                       color="primary" 
                       type="submit"
+                      class="action-button"
                       [disabled]="loadingProfile || profileForm.invalid">
                       @if (loadingProfile) {
-                        <mat-spinner diameter="20"></mat-spinner>
-                        <span>Guardando...</span>
+                        <div class="button-content">
+                          <mat-spinner diameter="20"></mat-spinner>
+                          <span>Guardando...</span>
+                        </div>
                       }
                       @if (!loadingProfile) {
-                        <ng-container>
+                        <div class="button-content">
                           <mat-icon>save</mat-icon>
                           <span>Guardar Cambios</span>
-                        </ng-container>
+                        </div>
                       }
                     </button>
                   </div>
@@ -252,16 +255,19 @@
                       mat-raised-button 
                       color="primary" 
                       type="submit"
+                      class="action-button"
                       [disabled]="loadingPassword || passwordForm.invalid">
                       @if (loadingPassword) {
-                        <mat-spinner diameter="20"></mat-spinner>
-                        <span>Cambiando...</span>
+                        <div class="button-content">
+                          <mat-spinner diameter="20"></mat-spinner>
+                          <span>Cambiando...</span>
+                        </div>
                       }
                       @if (!loadingPassword) {
-                        <ng-container>
+                        <div class="button-content">
                           <mat-icon>save</mat-icon>
                           <span>Cambiar Contraseña</span>
-                        </ng-container>
+                        </div>
                       }
                     </button>
                   </div>

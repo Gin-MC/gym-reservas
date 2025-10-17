@@ -48,55 +48,55 @@
             {{ getErrorMessage('password') }}
           </mat-error>
         }
-      </mat-form-field>
+        </mat-form-field>
       
-      <!-- Error Message -->
-      @if (errorMessage) {
-        <div class="error-message">
-          <mat-icon>error</mat-icon>
-          {{ errorMessage }}
-        </div>
-      }
-      
-      <!-- Botón de Google -->
-      <button 
-      mat-raised-button 
-      class="google-button"
-      type="button"
-      (click)="loginWithGoogle()"
-      [disabled]="loadingGoogle">
-      @if (loadingGoogle) {
-        <mat-spinner diameter="20"></mat-spinner>
-      }
-      @if (!loadingGoogle) {
-        <img src="assets/images/auth/google.svg" alt="Google" class="google-icon" width="18" height="18">
-        <span>Continuar con Google</span>
-      }
-    </button>
+        <!-- Error Message -->
+        @if (errorMessage) {
+          <div class="error-message">
+            <mat-icon>error</mat-icon>
+            {{ errorMessage }}
+          </div>
+        }
+        
+        <!-- Botón de Google -->
+        <button 
+        mat-raised-button 
+        class="google-button"
+        type="button"
+        (click)="loginWithGoogle()"
+        [disabled]="loadingGoogle">
+        @if (loadingGoogle) {
+          <mat-spinner diameter="20"></mat-spinner>
+        }
+        @if (!loadingGoogle) {
+          <img src="https://img.icons8.com/color/512/google-logo.png" alt="Google" class="google-icon" width="18" height="18">
+          <span>Continuar con Google</span>
+        }
+        </button>
 
-    <mat-divider class="divider">
-        <span class="divider-text">O</span>
-    </mat-divider>
+        <mat-divider class="divider">
+            <span class="divider-text"></span>
+        </mat-divider>
+        
+        <!-- Submit Button -->
+        <button 
+        mat-raised-button 
+        color="primary" 
+        type="submit" 
+        class="submit-button"
+        [disabled]="loading">
+        @if (loading) {
+          <mat-spinner diameter="20"></mat-spinner>
+        }
+        @if (!loading) {
+          <span>Ingresar</span>
+        }
+        </button>
     
-    <!-- Submit Button -->
-    <button 
-    mat-raised-button 
-    color="primary" 
-    type="submit" 
-    class="submit-button"
-    [disabled]="loading">
-    @if (loading) {
-      <mat-spinner diameter="20"></mat-spinner>
-    }
-    @if (!loading) {
-      <span>Ingresar</span>
-    }
-  </button>
-  
-  <!-- Register Link -->
-  <div class="register-link">
-    ¿No tienes cuenta? 
-      <a routerLink="/register">Regístrate aquí</a>
+        <!-- Register Link -->
+        <div class="register-link">
+          ¿No tienes cuenta? 
+          <a routerLink="/register">Regístrate aquí</a>
         </div>
       </form>
     </mat-card-content>
